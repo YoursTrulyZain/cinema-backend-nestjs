@@ -1,0 +1,94 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id String @id @default(cuid())
+  email String @unique
+  name String
+  tickets Ticket[]
+  createdAt DateTime @default(now())
+}
+
+model Movie {
+  id String @id @default(cuid())
+  title String 
+  description String
+  duration Int
+  screenings Screening[]
+}
+
+model Ticket {
+  id String @id @default(cuid())
+  user User @relation(fields: [userId], references: [id])
+  userId String
+  seat Seat @relation(fields: [seatId], references: [id])
+  seatId String @unique
+  purchasedAt DateTime @default(now())
+  refunded Boolean @default(false)
+}
+
+model Seat {
+  id String @id @default(cuid())
+  auditorium Int
+  row Row
+  number Int
+  screening Screening @relation(fields: [screeningId], references: [id])
+  screeningId String
+  ticket Ticket?
+}
+
+model Screening {
+  id String @id @default(cuid())
+  movie Movie @relation(fields: [movieId], references: [id])
+  movieId String
+  auditorium Auditorium @relation(fields: [auditoriumId], references: [id])
+  auditoriumId String
+  startTime DateTime
+  seats Seat[]
+}
+
+model Theatre {
+  id String @id @default(cuid())
+  name String
+  location String
+  audiotoriums Auditorium[]
+}
+
+model Auditorium {
+  id String @id @default(cuid())
+  number Int
+  theatre Theatre @relation(fields: [theatreId], references: [id])
+  theatreId String
+  seatMap Json        // Layout as a JSON object
+  screenings Screening[]
+}
+
+enum Row {
+  AA
+  A
+  B
+  C
+  D
+  E
+  F
+  G
+  H
+  I
+  J
+  K
+  L
+  M
+}
