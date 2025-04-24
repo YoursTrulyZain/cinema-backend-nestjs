@@ -1,26 +1,75 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateScreeningDto } from './dto/create-screening.dto';
 import { UpdateScreeningDto } from './dto/update-screening.dto';
+import { DatabaseService } from 'src/database/database.service';
+import { ScreeningEntity } from './entities/screening.entity';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ScreeningService {
-  create(createScreeningDto: CreateScreeningDto) {
-    return 'This action adds a new screening';
+
+  constructor(private readonly prisma: DatabaseService){}
+
+  async create(createScreeningDto: CreateScreeningDto): Promise<ScreeningEntity> {
+    try {
+      const screening = await this.prisma.screening.create( {data: createScreeningDto} );
+      return new ScreeningEntity(screening)
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create screening');
+    }
   }
 
-  findAll() {
-    return `This action returns all screening`;
+  async findAll(): Promise<ScreeningEntity[]> {
+    try {
+      const screenings = await this.prisma.screening.findMany();
+      return screenings.map(screening => new ScreeningEntity(screening));
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch screenings');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} screening`;
+  async findOne(id: string): Promise<ScreeningEntity> {
+    try {
+      const screening = await this.prisma.screening.findUniqueOrThrow({where: {id}})
+      return new ScreeningEntity(screening)
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Screening with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to fetch screening');
+    }
   }
 
-  update(id: number, updateScreeningDto: UpdateScreeningDto) {
-    return `This action updates a #${id} screening`;
+  async update(id: string, updateScreeningDto: UpdateScreeningDto): Promise<ScreeningEntity> {
+    try {
+      const screening = await this.prisma.screening.update({where: {id}, data: updateScreeningDto})
+      return new ScreeningEntity(screening)
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Screening with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to update screening');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} screening`;
+  async remove(id: string): Promise<ScreeningEntity> {
+    try {
+      const screening = await this.prisma.screening.delete({where: {id}})
+      return new ScreeningEntity(screening)
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Screening with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to delete screening');
+    }
   }
 }
