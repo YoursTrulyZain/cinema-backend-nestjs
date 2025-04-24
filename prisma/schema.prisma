@@ -7,11 +7,13 @@
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  schemas  = ["cinema-backend-nestjs"]
 }
 
 model User {
@@ -20,6 +22,7 @@ model User {
   name String
   tickets Ticket[]
   createdAt DateTime @default(now())
+  @@schema("cinema-backend-nestjs")
 }
 
 model Movie {
@@ -28,6 +31,7 @@ model Movie {
   description String
   duration Int
   screenings Screening[]
+  @@schema("cinema-backend-nestjs")
 }
 
 model Ticket {
@@ -38,6 +42,7 @@ model Ticket {
   seatId String @unique
   purchasedAt DateTime @default(now())
   refunded Boolean @default(false)
+  @@schema("cinema-backend-nestjs")
 }
 
 model Seat {
@@ -48,6 +53,7 @@ model Seat {
   screening Screening @relation(fields: [screeningId], references: [id])
   screeningId String
   ticket Ticket?
+  @@schema("cinema-backend-nestjs")
 }
 
 model Screening {
@@ -58,6 +64,7 @@ model Screening {
   auditoriumId String
   startTime DateTime
   seats Seat[]
+  @@schema("cinema-backend-nestjs")
 }
 
 model Theatre {
@@ -65,6 +72,7 @@ model Theatre {
   name String
   location String
   audiotoriums Auditorium[]
+  @@schema("cinema-backend-nestjs")
 }
 
 model Auditorium {
@@ -74,6 +82,7 @@ model Auditorium {
   theatreId String
   seatMap Json        // Layout as a JSON object
   screenings Screening[]
+  @@schema("cinema-backend-nestjs")
 }
 
 enum Row {
@@ -91,4 +100,5 @@ enum Row {
   K
   L
   M
+  @@schema("cinema-backend-nestjs")
 }
