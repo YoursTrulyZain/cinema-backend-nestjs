@@ -19,16 +19,16 @@ export class ScreeningController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.screeningService.findOne(+id);
+    return this.screeningService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateScreeningDto: UpdateScreeningDto) {
-    return this.screeningService.update(+id, updateScreeningDto);
+    return this.screeningService.update(id, updateScreeningDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.screeningService.remove(+id);
+    return this.screeningService.remove(id);
   }
 }

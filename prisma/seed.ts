@@ -1,106 +1,210 @@
-import { PrismaClient } from '@prisma/client';
-import { $Enums } from '@prisma/client';
+import { PrismaClient, Row, Type } from '@prisma/client'
 
-const prisma = new PrismaClient();
-
-const ROWS: $Enums.Row[] = [
-  $Enums.Row.AA, $Enums.Row.A, $Enums.Row.B, $Enums.Row.C, $Enums.Row.D, $Enums.Row.E, $Enums.Row.F,
-  $Enums.Row.G, $Enums.Row.H, $Enums.Row.I, $Enums.Row.J, $Enums.Row.K, $Enums.Row.L, $Enums.Row.M
-];
+const prisma = new PrismaClient()
 
 async function main() {
-  // Seed theatres and auditoriums
-  const theatre = await prisma.theatre.create({
-    data: {
-      name: "Downtown Cinema",
-      location: "123 Main Street",
-      audiotoriums: {
-        create: [
-          { number: 1, seatMap: {} },
-          { number: 2, seatMap: {} },
-        ],
+  // Create Theatres
+  const theatres = await Promise.all([
+    prisma.theatre.create({
+      data: {
+        name: 'Downtown Cinema',
+        location: '123 Main St, Toronto, ON',
+        phone: '416-555-1234',
+        email: 'info@downtowncinema.ca',
       },
-    },
-    include: { audiotoriums: true },
-  });
+    }),
+    prisma.theatre.create({
+      data: {
+        name: 'Uptown Theatre',
+        location: '456 King St, Toronto, ON',
+        phone: '416-555-5678',
+        email: 'contact@uptowntheatre.ca',
+      },
+    }),
+  ])
 
-  // Seed movies
-  const movies = await prisma.movie.createMany({
-    data: [
-      { title: "Interstellar", description: "Space travel to save humanity.", duration: 169 },
-      { title: "Inception", description: "Dream within a dream thriller.", duration: 148 },
-      { title: "The Matrix", description: "Hacker discovers reality isn't real.", duration: 136 }
-    ]
-  });
+  // Create Auditoriums
+  const auditoriums = await Promise.all([
+    prisma.auditorium.create({
+      data: {
+        number: 1,
+        type: 'IMAX',
+        theatreId: theatres[0].id,
+      },
+    }),
+    prisma.auditorium.create({
+      data: {
+        number: 2,
+        type: 'STANDARD',
+        theatreId: theatres[0].id,
+      },
+    }),
+    prisma.auditorium.create({
+      data: {
+        number: 1,
+        type: 'DOLBY_3D',
+        theatreId: theatres[1].id,
+      },
+    }),
+  ])
 
-  const movieList = await prisma.movie.findMany();
-
-  // Seed screenings for each movie in each auditorium at different times
-  const now = new Date();
-  const screenings: { id: string; movieId: string; auditoriumId: string; startTime: Date }[] = [];
-  for (const auditorium of theatre.audiotoriums) {
-    for (const movie of movieList) {
-      const screening = await prisma.screening.create({
-        data: {
-          movieId: movie.id,
-          auditoriumId: auditorium.id,
-          startTime: new Date(now.getTime() + Math.random() * 1e7), // Random future time
-        }
-      });
-      screenings.push(screening);
-    }
-  }
-
-  // Generate seats for each screening
-  for (const screening of screenings) {
-    for (const row of ROWS) {
-      for (let i = 1; i <= 18; i++) {
-        await prisma.seat.create({
+  // Generate Seats for each auditorium
+  const seatPromises = auditoriums.flatMap((auditorium) => {
+    return Object.values(Row).flatMap((row) =>
+      Array.from({ length: 18 }).map((_, index) => {
+        return prisma.seat.create({
           data: {
-            auditorium: 1, // Simplification: assuming same layout across auditoriums
+            auditoriumId: auditorium.id,
             row,
-            number: i,
-            screeningId: screening.id,
+            number: index + 1,
           },
-        });
-      }
-    }
+        })
+      })
+    )
+  })
+  await Promise.all(seatPromises)
+
+  // Create Movies
+  const movies = await Promise.all([
+    prisma.movie.create({
+      data: {
+        title: 'The Grand Adventure',
+        description: 'A journey through unknown lands.',
+        tags: ['adventure', 'fantasy'],
+        duration: 130,
+      },
+    }),
+    prisma.movie.create({
+      data: {
+        title: 'Sci-Fi Saga',
+        description: 'A battle beyond the stars.',
+        tags: ['sci-fi', 'action'],
+        duration: 145,
+      },
+    }),
+    prisma.movie.create({
+      data: {
+        title: 'Romantic Escape',
+        description: 'Two lovers on the run.',
+        tags: ['romance', 'drama'],
+        duration: 115,
+      },
+    }),
+    prisma.movie.create({
+      data: {
+        title: 'Haunted Halls',
+        description: 'A chilling story set in an old mansion.',
+        tags: ['horror', 'thriller'],
+        duration: 102,
+      },
+    }),
+  ])
+
+  const now = new Date()
+  const screenings = await Promise.all([
+    prisma.screening.create({
+      data: {
+        movieId: movies[0].id,
+        auditoriumId: auditoriums[0].id,
+        startTime: new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.screening.create({
+      data: {
+        movieId: movies[1].id,
+        auditoriumId: auditoriums[1].id,
+        startTime: new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.screening.create({
+      data: {
+        movieId: movies[2].id,
+        auditoriumId: auditoriums[2].id,
+        startTime: new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000 + 20 * 60 * 60 * 1000),
+      },
+    }),
+    prisma.screening.create({
+      data: {
+        movieId: movies[3].id,
+        auditoriumId: auditoriums[0].id,
+        startTime: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000 + 22 * 60 * 60 * 1000),
+      },
+    }),
+  ])
+
+  // Create Users
+  const users = await Promise.all([
+    prisma.user.create({
+      data: {
+        email: 'alice@example.com',
+        name: 'Alice',
+        password: 'password123',
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'bob@example.com',
+        name: 'Bob',
+        password: 'securepass',
+      },
+    }),
+    prisma.user.create({
+      data: {
+        email: 'charlie@example.com',
+        name: 'Charlie',
+        password: 'hunter2',
+      },
+    }),
+  ])
+
+  // Fetch specific seats
+  const seat1 = await prisma.seat.findFirst({
+    where: { auditoriumId: auditoriums[0].id, row: 'A', number: 1 },
+  })
+
+  const seat2 = await prisma.seat.findFirst({
+    where: { auditoriumId: auditoriums[1].id, row: 'B', number: 2 },
+  })
+
+  const seat3 = await prisma.seat.findFirst({
+    where: { auditoriumId: auditoriums[2].id, row: 'C', number: 5 },
+  })
+
+  // Create Tickets
+  if (seat1 && seat2 && seat3) {
+    await prisma.ticket.create({
+      data: {
+        userId: users[0].id,
+        seatId: seat1.id,
+        screeningId: screenings[0].id,
+      },
+    })
+
+    await prisma.ticket.create({
+      data: {
+        userId: users[1].id,
+        seatId: seat2.id,
+        screeningId: screenings[1].id,
+      },
+    })
+
+    await prisma.ticket.create({
+      data: {
+        userId: users[2].id,
+        seatId: seat3.id,
+        screeningId: screenings[2].id,
+      },
+    })
   }
 
-  // Create users
-  const users = await prisma.user.createMany({
-    data: [
-      { name: "Alice Johnson", email: "alice@example.com" },
-      { name: "Bob Smith", email: "bob@example.com" },
-      { name: "Charlie Brown", email: "charlie@example.com" },
-    ]
-  });
-
-  const userList = await prisma.user.findMany();
-  const seatList = await prisma.seat.findMany({
-    take: 15,
-    include: { screening: true },
-  });
-
-  // Purchase 15 tickets: 5 per user
-  let seatIdx = 0;
-  for (const user of userList) {
-    for (let i = 0; i < 5; i++) {
-      const seat = seatList[seatIdx];
-      await prisma.ticket.create({
-        data: {
-          userId: user.id,
-          seatId: seat.id,
-        },
-      });
-      seatIdx++;
-    }
-  }
+  console.log('Database seeded! ✅')
 }
 
 main()
-  .then(() => console.log("Seeding completed."))
-  .catch((e) => console.error(e))
+  .catch((e) => {
+    console.error(e)
+    process.exit(1)
+  })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })

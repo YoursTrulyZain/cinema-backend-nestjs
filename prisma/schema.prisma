@@ -6,83 +6,83 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
-  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
-  schemas  = ["cinema-backend-nestjs"]
 }
 
 model User {
-  id String @id @default(cuid())
-  email String @unique
-  name String
-  tickets Ticket[]
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  phone     String?
+  isAdmin   Boolean  @default(false)
+  tickets   Ticket[]
   createdAt DateTime @default(now())
-  @@schema("cinema-backend-nestjs")
 }
 
 model Movie {
-  id String @id @default(cuid())
-  title String 
+  id          String      @id @default(cuid())
+  title       String
   description String
-  duration Int
-  screenings Screening[]
-  @@schema("cinema-backend-nestjs")
+  tags        String[]
+  duration    Int
+  screenings  Screening[]
 }
 
 model Ticket {
-  id String @id @default(cuid())
-  user User @relation(fields: [userId], references: [id])
-  userId String
-  seat Seat @relation(fields: [seatId], references: [id])
-  seatId String @unique
-  purchasedAt DateTime @default(now())
-  refunded Boolean @default(false)
-  @@schema("cinema-backend-nestjs")
+  id          String    @id @default(cuid())
+  user        User      @relation(fields: [userId], references: [id])
+  userId      String
+  seat        Seat      @relation(fields: [seatId], references: [id])
+  seatId      String
+  screening   Screening @relation(fields: [screeningId], references: [id])
+  screeningId String
+  purchasedAt DateTime  @default(now())
+  refunded    Boolean   @default(false)
+
+  @@unique([seatId, screeningId]) // Compound unique constraint
 }
 
 model Seat {
-  id String @id @default(cuid())
-  auditorium Int
-  row Row
-  number Int
-  screening Screening @relation(fields: [screeningId], references: [id])
-  screeningId String
-  ticket Ticket?
-  @@schema("cinema-backend-nestjs")
+  id           String     @id @default(cuid())
+  auditorium   Auditorium @relation(fields: [auditoriumId], references: [id])
+  auditoriumId String
+  row          Row
+  number       Int
+  ticket       Ticket[]
 }
 
 model Screening {
-  id String @id @default(cuid())
-  movie Movie @relation(fields: [movieId], references: [id])
-  movieId String
-  auditorium Auditorium @relation(fields: [auditoriumId], references: [id])
+  id           String     @id @default(cuid())
+  movie        Movie      @relation(fields: [movieId], references: [id])
+  movieId      String
+  auditorium   Auditorium @relation(fields: [auditoriumId], references: [id])
   auditoriumId String
-  startTime DateTime
-  seats Seat[]
-  @@schema("cinema-backend-nestjs")
+  startTime    DateTime
+  tickets      Ticket[]
 }
 
 model Theatre {
-  id String @id @default(cuid())
-  name String
-  location String
-  audiotoriums Auditorium[]
-  @@schema("cinema-backend-nestjs")
+  id          String       @id @default(cuid())
+  name        String
+  location    String
+  phone       String
+  email       String
+  auditoriums Auditorium[]
 }
 
 model Auditorium {
-  id String @id @default(cuid())
-  number Int
-  theatre Theatre @relation(fields: [theatreId], references: [id])
-  theatreId String
-  seatMap Json        // Layout as a JSON object
+  id         String      @id @default(cuid())
+  number     Int
+  type       Type
+  theatre    Theatre     @relation(fields: [theatreId], references: [id])
+  theatreId  String
+  seats      Seat[]
   screenings Screening[]
-  @@schema("cinema-backend-nestjs")
 }
 
 enum Row {
@@ -100,5 +100,14 @@ enum Row {
   K
   L
   M
-  @@schema("cinema-backend-nestjs")
+}
+
+enum Type {
+  IMAX
+  STANDARD
+  CC
+  DBOX
+  SCREENX
+  DOLBY_ATMOS
+  DOLBY_3D
 }
