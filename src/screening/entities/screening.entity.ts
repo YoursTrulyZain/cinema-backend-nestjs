@@ -1,12 +1,10 @@
-import { Screening } from "@prisma/client"
-
-export class ScreeningEntity implements Screening {
+export class ScreeningEntity {
     id: string
     startTime: Date;
     movieId: string;
     auditoriumId: string;
 
-    constructor(partial: Partial<Screening>) {
+    constructor(partial: Partial<ScreeningEntity>) {
         Object.assign(this, partial);
       }
 }

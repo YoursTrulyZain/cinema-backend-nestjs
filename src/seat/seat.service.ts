@@ -1,26 +1,73 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateSeatDto } from './dto/create-seat.dto';
 import { UpdateSeatDto } from './dto/update-seat.dto';
+import { SeatEntity } from './entities/seat.entity';
+import { DatabaseService } from 'src/database/database.service';
+import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class SeatService {
-  create(createSeatDto: CreateSeatDto) {
-    return 'This action adds a new seat';
+  constructor(private readonly prisma: DatabaseService) {}
+  async create(createSeatDto: CreateSeatDto): Promise<SeatEntity> {
+    try {
+      const seat = await this.prisma.seat.create({data: createSeatDto});
+      return new SeatEntity(seat);
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to create seat');
+    }
   }
 
-  findAll() {
-    return `This action returns all seat`;
+  async findAll(): Promise<SeatEntity[]> {
+    try {
+      const seats = await this.prisma.seat.findMany();
+      return seats.map(seat => new SeatEntity(seat));
+    } catch (error) {
+      throw new InternalServerErrorException('Failed to fetch seats');
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} seat`;
+  async findOne(id: string): Promise<SeatEntity> {
+    try {
+      const seat = await this.prisma.seat.findUniqueOrThrow({ where: { id } });
+      return new SeatEntity(seat);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Seat with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to fetch seat');
+    }
   }
 
-  update(id: number, updateSeatDto: UpdateSeatDto) {
-    return `This action updates a #${id} seat`;
+  async update(id: string, updateSeatDto: UpdateSeatDto): Promise<SeatEntity> {
+    try {
+      const seat = await this.prisma.seat.update({ where: { id }, data: updateSeatDto });
+      return new SeatEntity(seat);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Seat with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to update seat');
+    }
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} seat`;
+  async remove(id: string): Promise<SeatEntity> {
+    try {
+      const seat = await this.prisma.seat.delete({ where: { id } });
+      return new SeatEntity(seat);
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException(`Seat with ID ${id} not found`);
+      }
+      throw new InternalServerErrorException('Failed to delete seat');
+    }
   }
 }

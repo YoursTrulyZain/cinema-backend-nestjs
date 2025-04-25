@@ -1,5 +1,4 @@
-import { Movie } from "@prisma/client";
-export class MovieEntity implements Movie {
+export class MovieEntity {
     id: string;
     title: string;
     description: string;
