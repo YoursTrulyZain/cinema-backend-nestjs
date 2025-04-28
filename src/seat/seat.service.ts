@@ -2,12 +2,12 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { CreateSeatDto } from './dto/create-seat.dto';
 import { UpdateSeatDto } from './dto/update-seat.dto';
 import { SeatEntity } from './entities/seat.entity';
-import { DatabaseService } from 'src/database/database.service';
 import { Prisma } from '@prisma/client';
+import { PrismaService } from 'prisma/prisma.service';
 
 @Injectable()
 export class SeatService {
-  constructor(private readonly prisma: DatabaseService) {}
+  constructor(private readonly prisma: PrismaService) {}
   async create(createSeatDto: CreateSeatDto): Promise<SeatEntity> {
     try {
       const seat = await this.prisma.seat.create({data: createSeatDto});

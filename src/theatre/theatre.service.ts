@@ -9,15 +9,15 @@ export class TheatreService {
   constructor(@Inject('ITheatreRepository') private readonly theatreRepository: ITheatreRepository) {}
 
   create(createTheatreDto: CreateTheatreDto) {
-    return 'This action adds a new theatre';
+    return this.theatreRepository.create(createTheatreDto);
   }
 
   findAll() {
-    return `This action returns all theatre`;
+    return this.theatreRepository.findAll();
   }
 
   findOne(id: string) {
-    return `This action returns a #${id} theatre`;
+    return this.theatreRepository.findOne(id);
   }
 
   findAllWithEverything() {
@@ -29,10 +29,10 @@ export class TheatreService {
   }
 
   update(id: string, updateTheatreDto: UpdateTheatreDto) {
-    return `This action updates a #${id} theatre`;
+    return this.theatreRepository.update(id, updateTheatreDto);
   }
 
   remove(id: string) {
-    return `This action removes a #${id} theatre`;
+    return this.theatreRepository.remove(id);
   }
 }

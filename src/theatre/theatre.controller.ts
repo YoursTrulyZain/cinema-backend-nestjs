@@ -17,11 +17,6 @@ export class TheatreController {
     return this.theatreService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.theatreService.findOne(id);
-  }
-
   @Get('everything')
   findAllWithEverything() {
     return this.theatreService.findAllWithEverything();
@@ -30,6 +25,11 @@ export class TheatreController {
   @Get('everything/:id')
   findOneWithEverything(@Param('id') id: string) {
     return this.theatreService.findOneWithEverything(id);
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.theatreService.findOne(id);
   }
 
   @Patch(':id')

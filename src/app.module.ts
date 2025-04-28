@@ -8,10 +8,10 @@ import { SeatModule } from './seat/seat.module';
 import { TicketModule } from './ticket/ticket.module';
 import { UserModule } from './user/user.module';
 import { AuditoriumModule } from './auditorium/auditorium.module';
-import { DatabaseModule } from './database/database.module';
+import { PrismaModule } from 'prisma/prisma.module';
 
 @Module({
-  imports: [MovieModule, TheatreModule, ScreeningModule, SeatModule, TicketModule, UserModule, AuditoriumModule, DatabaseModule],
+  imports: [MovieModule, TheatreModule, ScreeningModule, SeatModule, TicketModule, UserModule, AuditoriumModule, PrismaModule],
   controllers: [AppController],
   providers: [AppService],
 })
