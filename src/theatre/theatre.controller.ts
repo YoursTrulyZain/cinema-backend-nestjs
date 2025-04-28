@@ -19,16 +19,26 @@ export class TheatreController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.theatreService.findOne(+id);
+    return this.theatreService.findOne(id);
+  }
+
+  @Get('everything')
+  findAllWithEverything() {
+    return this.theatreService.findAllWithEverything();
+  }
+  
+  @Get('everything/:id')
+  findOneWithEverything(@Param('id') id: string) {
+    return this.theatreService.findOneWithEverything(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTheatreDto: UpdateTheatreDto) {
-    return this.theatreService.update(+id, updateTheatreDto);
+    return this.theatreService.update(id, updateTheatreDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.theatreService.remove(+id);
+    return this.theatreService.remove(id);
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateScreeningDto } from './dto/create-screening.dto';
 import { UpdateScreeningDto } from './dto/update-screening.dto';
 import { ScreeningEntity } from './entities/screening.entity';
@@ -7,7 +7,7 @@ import { IScreeningRepository } from './interfaces/screening-repository.interfac
 @Injectable()
 export class ScreeningService {
 
-  constructor(private readonly screeningRepository: IScreeningRepository){}
+  constructor(@Inject('IScreeningRepository') private readonly screeningRepository: IScreeningRepository){}
 
   async create(createScreeningDto: CreateScreeningDto): Promise<ScreeningEntity> {
     return this.screeningRepository.create(createScreeningDto);

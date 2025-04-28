@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import { Inject, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateMovieDto } from './dto/create-movie.dto';
 import { UpdateMovieDto } from './dto/update-movie.dto';
 import { MovieEntity } from './entities/movie.entity';
@@ -7,7 +7,7 @@ import { IMovieRepository } from './interfaces/movie-repository.interface';
 @Injectable()
 export class MovieService {
 
-  constructor(private readonly movieRepository: IMovieRepository) {}
+  constructor(@Inject('IMovieRepository') private readonly movieRepository: IMovieRepository) {}
 
   async create(createMovieDto: CreateMovieDto): Promise<MovieEntity> {
     return this.movieRepository.create(createMovieDto);
