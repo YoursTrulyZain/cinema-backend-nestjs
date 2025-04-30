@@ -5,15 +5,20 @@ import { UserEntity } from "../entities/user.entity";
 import { CreateUserDto } from "../dto/create-user.dto";
 import { UpdateUserDto } from "../dto/update-user.dto";
 import { Prisma } from "@prisma/client";
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
     constructor(private readonly prisma: PrismaService) {}
 
     async create(createUserDto: CreateUserDto): Promise<UserEntity> {
+        const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
         try {
             const user = await this.prisma.user.create({
-                data: createUserDto,
+                data: {
+                    ...createUserDto,
+                    password: hashedPassword,
+                },
             });
             return new UserEntity(user);
         } catch (error) {

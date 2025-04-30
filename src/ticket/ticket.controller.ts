@@ -17,18 +17,28 @@ export class TicketController {
     return this.ticketService.findAll();
   }
 
+  @Get('user/:userId')
+  findByUser(@Param('userId') userId: string) {
+    return this.ticketService.findByUser(userId);
+  }
+  
+  @Get('screening/:screeningId')
+  findByScreening(@Param('screeningId') screeningId: string) {
+    return this.ticketService.findByScreening(screeningId);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.ticketService.findOne(+id);
+    return this.ticketService.findOne(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateTicketDto: UpdateTicketDto) {
-    return this.ticketService.update(+id, updateTicketDto);
+    return this.ticketService.update(id, updateTicketDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.ticketService.remove(+id);
+    return this.ticketService.remove(id);
   }
 }
