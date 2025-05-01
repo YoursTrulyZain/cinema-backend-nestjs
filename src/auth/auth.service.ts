@@ -1,7 +1,8 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { IAuthRepository } from './interfaces/auth.repository.interface';
 import { JwtCustomService } from 'src/jwt/jwt.service';
-import { UserEntity } from 'src/user/entities/user.entity';
+import { LoginDto } from './dto/login.dto';
+import { AuthResponseDto } from './dto/auth-response.dto';
 
 @Injectable()
 export class AuthService {
@@ -11,13 +12,10 @@ export class AuthService {
         private readonly jwtService:JwtCustomService) 
         {}
 
-    async validateUser(email:string, password:string) {
-        return this.authRepository.validateUser(email, password);
-    }
-
-    async login(user: UserEntity): Promise<{ access_token: string }> {
+    async login(loginDto: LoginDto): Promise<AuthResponseDto> {
+        const user = await this.authRepository.validateUser(loginDto.email, loginDto.password);
         const payload = { sub: user.id, email: user.email, isAdmin: user.isAdmin };
-        const access_token = this.jwtService.signToken(payload);
-        return { access_token };
+        const accessToken = this.jwtService.signToken(payload);
+        return new AuthResponseDto(accessToken);
       }
-}
+}   

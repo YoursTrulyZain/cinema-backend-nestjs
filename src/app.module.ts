@@ -11,13 +11,24 @@ import { AuditoriumModule } from './auditorium/auditorium.module';
 import { PrismaModule } from 'prisma/prisma.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { AuthModule } from './auth/auth.module';
-import { JwtService } from './jwt/jwt.service';
-import { JwtModule } from './jwt/jwt.module';
+import { JwtCustomModule } from './jwt/jwt.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
-  imports: [MovieModule, TheatreModule, ScreeningModule, SeatModule, TicketModule, UserModule, AuditoriumModule, PrismaModule, AuthModule, JwtModule],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    MovieModule, 
+    TheatreModule, 
+    ScreeningModule, 
+    SeatModule, 
+    TicketModule, 
+    UserModule, 
+    AuditoriumModule, 
+    PrismaModule, 
+    AuthModule, 
+    JwtCustomModule],
   controllers: [AppController],
-  providers: [AppService, JwtService],
+  providers: [AppService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

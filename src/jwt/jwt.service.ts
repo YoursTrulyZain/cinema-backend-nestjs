@@ -5,9 +5,10 @@ import { JwtService } from '@nestjs/jwt';
 export class JwtCustomService {
   constructor(private readonly jwtService: JwtService) {}
 
-  signToken(payload: any, expiresIn: string | number = '1h'): string {
+  signToken<T extends object>(payload: T, expiresIn: string | number = '1h'): string {
     return this.jwtService.sign(payload, { expiresIn });
   }
+  
   verifyToken<T = any>(token: string): T {
     return this.jwtService.verify(token) as T;
   }
