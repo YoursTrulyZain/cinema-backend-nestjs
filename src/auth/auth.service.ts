@@ -14,7 +14,7 @@ export class AuthService {
 
     async login(loginDto: LoginDto): Promise<AuthResponseDto> {
         const user = await this.authRepository.validateUser(loginDto.email, loginDto.password);
-        const payload = { sub: user.id, email: user.email, isAdmin: user.isAdmin };
+        const payload = { sub: user.id };
         const accessToken = this.jwtService.signToken(payload);
         return new AuthResponseDto(accessToken);
       }
