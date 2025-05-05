@@ -5,7 +5,10 @@ import { ITicketRepository } from './interfaces/ticket-repository.interface';
 
 @Injectable()
 export class TicketService {
-  constructor(@Inject('ITicketRepository') private readonly ticketRepository: ITicketRepository) {}
+  constructor(
+    @Inject('ITicketRepository')
+    private readonly ticketRepository: ITicketRepository,
+  ) {}
 
   create(createTicketDto: CreateTicketDto) {
     return this.ticketRepository.create(createTicketDto);
@@ -17,6 +20,10 @@ export class TicketService {
 
   findOne(id: string) {
     return this.ticketRepository.findOne(id);
+  }
+
+  findOneWithRelations(id: string) {
+    return this.ticketRepository.findOneWithRelations(id);
   }
 
   findByUser(userId: string) {
