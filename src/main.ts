@@ -9,6 +9,8 @@ async function bootstrap() {
       'http://localhost:3000',
       'http://localhost:3001',
       'https://cinema.z41n.dev',
+      'https://cinema-frontend-nextjs.vercel.app',
+      'https://cinema-frontend-nextjs-zains-projects-1146680c.vercel.app',
     ],
     credentials: true,
   });
