@@ -8,7 +8,7 @@ async function bootstrap() {
     origin: [
       'http://localhost:3000',
       'http://localhost:3001',
-      'cinema.z41n.dev',
+      'https://cinema.z41n.dev',
     ],
     credentials: true,
   });
