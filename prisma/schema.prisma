@@ -31,6 +31,7 @@ model Movie {
   tags        String[]
   duration    Int
   screenings  Screening[]
+  posterUrl   String
 }
 
 model Ticket {
@@ -54,6 +55,8 @@ model Seat {
   row          Row
   number       Int
   tickets      Ticket[]
+
+  @@unique([auditoriumId, row, number])
 }
 
 model Screening {
@@ -64,14 +67,14 @@ model Screening {
   auditoriumId String
   startTime    DateTime
   tickets      Ticket[]
+
+  @@unique([auditoriumId, startTime])
 }
 
 model Theatre {
   id          String       @id @default(cuid())
   name        String
   location    String
-  phone       String
-  email       String
   auditoriums Auditorium[]
 }
 
@@ -83,6 +86,8 @@ model Auditorium {
   theatreId  String
   seats      Seat[]
   screenings Screening[]
+
+  @@unique([theatreId, number])
 }
 
 enum Row {
@@ -103,11 +108,12 @@ enum Row {
 }
 
 enum Type {
+  REGULAR
   IMAX
-  STANDARD
   CC
   DBOX
   SCREENX
   DOLBY_ATMOS
   DOLBY_3D
+  LASERPROJECTION
 }

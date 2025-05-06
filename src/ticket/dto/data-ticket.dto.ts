@@ -13,12 +13,6 @@ class TheatreDataDto {
 
   @IsString()
   location: string;
-
-  @IsString()
-  phone: string;
-
-  @IsString()
-  email: string;
 }
 
 class AuditoriumDataDto {

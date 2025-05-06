@@ -77,8 +77,6 @@ export class PrismaTicketRepository implements ITicketRepository {
                     select: {
                       name: true,
                       location: true,
-                      phone: true,
-                      email: true,
                     },
                   },
                 },
@@ -104,8 +102,6 @@ export class PrismaTicketRepository implements ITicketRepository {
                     select: {
                       name: true,
                       location: true,
-                      phone: true,
-                      email: true,
                     },
                   },
                 },

@@ -12,10 +12,10 @@ export class PrismaTheatreRepository {
 
   async create(createTheatreDto: CreateTheatreDto): Promise<TheatreEntity> {
     try {
-      const { name, location, phone, email, auditoriums } = createTheatreDto;
+      const { name, location, auditoriums } = createTheatreDto;
 
       const createdTheatre = await this.prisma.theatre.create({
-        data: { name, location, phone, email },
+        data: { name, location },
       });
 
       if (auditoriums.length > 0) {
@@ -126,11 +126,11 @@ export class PrismaTheatreRepository {
     updateTheatreDto: CreateTheatreDto,
   ): Promise<TheatreEntity> {
     try {
-      const { name, location, phone, email, auditoriums } = updateTheatreDto;
+      const { name, location, auditoriums } = updateTheatreDto;
 
       const updatedTheatre = await this.prisma.theatre.update({
         where: { id },
-        data: { name, location, phone, email },
+        data: { name, location },
       });
 
       try {

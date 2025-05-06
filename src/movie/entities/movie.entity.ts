@@ -1,11 +1,12 @@
 export class MovieEntity {
-    id: string;
-    title: string;
-    description: string;
-    tags: string[];
-    duration: number;
+  id: string;
+  title: string;
+  description: string;
+  tags: string[];
+  duration: number;
+  posterUrl: string;
 
-    constructor(partial: Partial<MovieEntity>) {
-        Object.assign(this, partial);
-    }
+  constructor(partial: Partial<MovieEntity>) {
+    Object.assign(this, partial);
+  }
 }

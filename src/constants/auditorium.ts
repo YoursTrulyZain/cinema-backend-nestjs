@@ -1,12 +1,20 @@
-export type AuditoriumType = 
+export type AuditoriumType =
   | 'IMAX'
-  | 'STANDARD'
+  | 'REGULAR'
   | 'CC'
   | 'DBOX'
   | 'SCREENX'
   | 'DOLBY_ATMOS'
-  | 'DOLBY_3D';
+  | 'DOLBY_3D'
+  | 'LASERPROJECTION';
 
 export const ALL_AUDITORIUM_TYPES: AuditoriumType[] = [
-  'IMAX', 'STANDARD', 'CC', 'DBOX', 'SCREENX', 'DOLBY_ATMOS', 'DOLBY_3D',
+  'IMAX',
+  'REGULAR',
+  'CC',
+  'DBOX',
+  'SCREENX',
+  'DOLBY_ATMOS',
+  'DOLBY_3D',
+  'LASERPROJECTION',
 ];
