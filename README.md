@@ -6,24 +6,173 @@
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
   <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
 
-## Description
+# Cinema Backend API
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+A robust backend API for a cinema management system built with NestJS, providing comprehensive functionality for managing movies, theatres, screenings, tickets, and user authentication.
+
+## Features
+
+- **User Management**
+
+  - User registration and authentication
+  - JWT-based authentication
+  - User profile management
+  - Role-based access control (Admin/User)
+
+- **Movie Management**
+
+  - CRUD operations for movies
+  - Movie details including title, description, duration, and tags
+  - Movie poster management
+
+- **Theatre Management**
+
+  - Theatre creation and management
+  - Multiple auditorium support per theatre
+  - Different auditorium types (REGULAR, IMAX, CC, DBOX, SCREENX, DOLBY_ATMOS, DOLBY_3D, LASERPROJECTION)
+
+- **Screening Management**
+
+  - Schedule movie screenings
+  - Manage screening times and auditorium assignments
+  - View available screenings
+
+- **Seat Management**
+
+  - Seat layout management per auditorium
+  - Row and number-based seat organization
+  - Seat availability tracking
+
+- **Ticket Management**
+  - Ticket booking system
+  - Ticket history per user
+  - Ticket refund functionality
+  - Seat reservation system
+
+## Technologies Used
+
+- **Framework**: NestJS
+- **Language**: TypeScript
+- **Database**: PostgreSQL
+- **ORM**: Prisma
+- **Authentication**: JWT (JSON Web Tokens)
+- **Validation**: class-validator, class-transformer
+- **Testing**: Jest
+- **Package Manager**: pnpm
+
+## Database Schema
+
+```mermaid
+erDiagram
+    User {
+        string id PK
+        string email UK
+        string name
+        string password
+        string phone
+        boolean isAdmin
+        datetime createdAt
+    }
+
+    Movie {
+        string id PK
+        string title
+        string description
+        string[] tags
+        int duration
+        string posterUrl
+    }
+
+    Theatre {
+        string id PK
+        string name
+        string location
+    }
+
+    Auditorium {
+        string id PK
+        int number
+        enum type
+        string theatreId FK
+    }
+
+    Seat {
+        string id PK
+        string auditoriumId FK
+        enum row
+        int number
+    }
+
+    Screening {
+        string id PK
+        string movieId FK
+        string auditoriumId FK
+        datetime startTime
+    }
+
+    Ticket {
+        string id PK
+        string userId FK
+        string seatId FK
+        string screeningId FK
+        datetime purchasedAt
+        boolean refunded
+    }
+
+    User ||--o{ Ticket : "has"
+    Movie ||--o{ Screening : "has"
+    Theatre ||--o{ Auditorium : "has"
+    Auditorium ||--o{ Seat : "has"
+    Auditorium ||--o{ Screening : "hosts"
+    Seat ||--o{ Ticket : "reserved in"
+    Screening ||--o{ Ticket : "has"
+```
+
+The diagram above shows the relationships between different entities in the database:
+
+- **User**: Stores user information and authentication details
+- **Movie**: Contains movie details and metadata
+- **Theatre**: Represents cinema locations
+- **Auditorium**: Different screening rooms within theatres
+- **Seat**: Individual seats in auditoriums
+- **Screening**: Movie showings in specific auditoriums
+- **Ticket**: Booking records linking users, seats, and screenings
+
+Key relationships:
+
+- A User can have multiple Tickets
+- A Movie can have multiple Screenings
+- A Theatre can have multiple Auditoriums
+- An Auditorium can have multiple Seats and Screenings
+- A Seat can be reserved in multiple Tickets
+- A Screening can have multiple Tickets
+
+## Project Setup
+
+```bash
+# Install dependencies
+$ pnpm install
+
+# Generate Prisma client
+$ pnpm prisma generate
+
+# Run database migrations
+$ pnpm prisma migrate dev
+
+# Start development server
+$ pnpm run start:dev
+```
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+DATABASE_URL="postgresql://user:password@localhost:5432/cinema_db"
+JWT_SECRET="your-jwt-secret"
+PORT=8080
+```
 
 ## Project setup
 
@@ -56,42 +205,6 @@ $ pnpm run test:e2e
 # test coverage
 $ pnpm run test:cov
 ```
-
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
-
-```bash
-$ pnpm install -g @nestjs/mau
-$ mau deploy
-```
-
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
-
-## Resources
-
-Check out a few resources that may come in handy when working with NestJS:
-
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
-
-## Support
-
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
-
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
 
 ## License
 
