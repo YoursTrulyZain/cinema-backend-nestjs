@@ -11,6 +11,8 @@
 
 A robust backend API for a cinema management system built with NestJS, providing comprehensive functionality for managing movies, theatres, screenings, tickets, and user authentication.
 
+The frontend for this project can be found here: https://github.com/YoursTrulyZain/cinema-frontend-nextjs
+
 ## Features
 
 - **User Management**
